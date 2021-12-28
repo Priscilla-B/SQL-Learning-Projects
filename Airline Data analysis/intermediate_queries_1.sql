@@ -93,12 +93,43 @@ LIMIT 1;
 
 -- SQL AGGREGATION CHALLENGE --
 -- 1. Determine how many flights from each city to other cities, return the the name of city and 
--- count of flights more than 50 order the data from the largest no of flights to the least?
-SELECT city, COUNT(city)
-FROM airports
+-- count of flights more than 50. Order the data from the largest number of flights to the least.
+SELECT city ->> 'en' AS city, COUNT(city)
+FROM flights
+LEFT JOIN airports
+ON airport_code = departure_airport
 GROUP BY city
-HAVING COUNT(city) > 50
+HAVING COUNT(city) >= 50
+ORDER BY COUNT DESC; -- optimal solution 
+					
+					-- OR --
+SELECT(SELECT city ->> 'en' FROM airports WHERE airport_code = departure_airport) AS departure_city,
+COUNT(*)
+FROM flights
+GROUP BY (SELECT city ->> 'en' 
+FROM airports 
+WHERE airport_code = departure_airport)
+HAVING COUNT(*) >=50
 ORDER BY COUNT DESC;
 
+-- 2. Return all flights from KZN airport in the indicated day: 2017-08-28 
+-- show all departure times, departure airport, arrival airport and flight number
 
 		
+SELECT flight_no, scheduled_departure::time, departure_airport, 
+	arrival_airport
+FROM flights
+WHERE departure_airport = 'KZN' 
+	AND scheduled_departure::date = '2017-08-28' 
+ORDER BY scheduled_departure
+
+				-- OR --
+SELECT f.flight_no,f.scheduled_departure :: time AS dep_time,
+f.departure_airport AS departures,f.arrival_airport AS arrivals,
+count (flight_id)AS flight_count
+FROM flights f
+WHERE f.departure_airport = 'KZN'
+AND f.scheduled_departure >= '2017-08-28' :: date
+AND f.scheduled_departure <'2017-08-29' :: date
+GROUP BY 1,2,3,4,f.scheduled_departure
+ORDER BY flight_count DESC,f.arrival_airport,f.scheduled_departure;
