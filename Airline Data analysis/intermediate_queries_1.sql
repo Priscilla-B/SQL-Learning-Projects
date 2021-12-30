@@ -4,6 +4,8 @@
 -- 	speciality TEXT NOT NULL,
 -- 	age TEXT 
 -- );
+-- ALTER TABLE pilots
+-- 	ALTER COLUMN age TYPE INT USING age::integer;
 
 -- INSERT INTO pilots(name, speciality, age)
 -- VALUES ('John', 'pilot', 50),
