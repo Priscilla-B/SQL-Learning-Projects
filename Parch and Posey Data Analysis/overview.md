@@ -12,4 +12,4 @@ The Parch and Posey Database is a hypothetical paper company's sales data of dif
 
 - Columns which have the PK tag refers to columns being used as primary keys, which are unique identifiers for each row/record in the table.
 - FK tags are for foreign keys which are primary keys in one table being referenced in other tables
-- The lines connecting the tables in the ERD represent the one-to-many relationships that exist among the table records. The one side of the relationships are represented by the short vertical lines with the many side represented by the multiple diverging arrows.
+- The lines connecting the tables in the ERD represent the one-to-many relationships that exist among the table records. The one side of the relationships are represented by the short vertical lines with the many side represented by the multiple diverging arrows(crow's foot).
