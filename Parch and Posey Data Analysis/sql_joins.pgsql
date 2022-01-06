@@ -1,6 +1,5 @@
 --                ************ BASIC SQL JOIN *******
-/*
-Joins allows data to be queried from more than one table at a time within a SELECT statement. 
+/* Joins allows data to be queried from more than one table at a time within a SELECT statement. 
 We use the ON clause with JOINs to specify the join condition, which is a logical statement to combine
 results from multiple tables.
 */
@@ -9,7 +8,7 @@ results from multiple tables.
 SELECT orders.*
 FROM orders
 JOIN accounts
-ON orders.account_id = accounts.id
+ON orders.account_id = accounts.id;
 -- returns same result as SELECT * FROM orders in this instance since this is just a basic join
 -- and no column from the second table was returned
 
@@ -62,7 +61,7 @@ ON o.account_id = a.id
 JOIN sales_reps s
 ON a.sales_rep_id = s.id
 JOIN region r
-ON r.id = s.region_id      
+ON r.id = s.region_id;      
 
 -- *** All the joins above have been inner joins, and return results that are common in the tables
 --     that are being joined   ***
@@ -74,7 +73,7 @@ SELECT *
 FROM orders o
 LEFT JOIN accounts a
 ON o.account_id = a.id
-WHERE a.sales_rep_id = 321500
+WHERE a.sales_rep_id = 321500;
 -- this filters the query after the join logic has executed. As a result returns only 
 -- rows where sales_rep_id is 321500 
 
@@ -83,7 +82,7 @@ SELECT *
 FROM orders o
 LEFT JOIN accounts a
 ON o.account_id = a.id
-	AND a.sales_rep_id = 321500
+	AND a.sales_rep_id = 321500;
 	
 -- here, the filter logic was added to the ON clause. This filters the accounts table before 
 -- executing the join logic. Since this is a left join, the query returns all rows where sales_rep_id is
@@ -101,7 +100,7 @@ ON s.region_id = r.id
 JOIN accounts a
 ON a.sales_rep_id = s.id
 WHERE r.name = 'Midwest'
-ORDER BY a.name
+ORDER BY a.name;
 
 
 -- 2. Provide a table that provides the region for each sales_rep along with their associated accounts. 
@@ -117,7 +116,7 @@ JOIN accounts a
 ON s.id = a.sales_rep_id
 WHERE r.name = 'Midwest'
 	AND s.name LIKE 'S%'
-ORDER BY a.name
+ORDER BY a.name;
 
 
 -- 3.Provide a table that provides the region for each sales_rep along with their associated accounts. 
@@ -133,7 +132,7 @@ JOIN accounts a
 ON s.id = a.sales_rep_id
 WHERE r.name = 'Midwest'
 	AND s.name LIKE  '% K%' -- this only works because this database records only first and last names for sales reps
-ORDER BY a.name
+ORDER BY a.name;
 
 -- 4. Provide the name for each region for every order, as well as the account name and the unit price 
 -- they paid (total_amt_usd/total) for the order. However, you should only provide the results if the 
@@ -148,7 +147,7 @@ JOIN accounts a
 ON s.id = a.sales_rep_id
 JOIN orders o
 ON a.id = o.account_id
-WHERE o.standard_qty > 100
+WHERE o.standard_qty > 100;
 
 
 -- 5. Provide the name for each region for every order, as well as the account name and the unit price
@@ -167,7 +166,7 @@ JOIN orders o
 ON a.id = o.account_id
 WHERE o.standard_qty > 100
 	AND o.poster_qty > 50
-ORDER BY 3 
+ORDER BY 3;
 
 
 -- 6. Provide the name for each region for every order, as well as the account name and the unit price 
@@ -187,7 +186,7 @@ JOIN orders o
 ON a.id = o.account_id
 WHERE o.standard_qty > 100
 	AND o.poster_qty > 50
-ORDER BY 3 DESC
+ORDER BY 3 DESC;
 
 -- What are the different channels used by account id 1001? Your final table should 
 -- have only 2 columns: account name and the different channels. You can try SELECT DISTINCT 
@@ -197,7 +196,7 @@ SELECT DISTINCT a.name, w.channel
 FROM accounts a
 JOIN web_events w
 ON a.id = w.account_id
-WHERE a.id = 1001
+WHERE a.id = 1001;
 
 
 -- Find all the orders that occurred in 2015. Your final table should have 4 columns: 
