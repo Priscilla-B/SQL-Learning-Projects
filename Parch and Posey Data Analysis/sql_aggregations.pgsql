@@ -201,5 +201,36 @@ GROUP BY 1, 2
 ORDER BY 3 DESC;
 
 
+-- DISTINCT
+-- QUESTIONS
+-- 1. Use DISTINCT to test if there are any accounts associated with more than one region.
+SELECT r.name region, a.name account
+FROM accounts a
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+JOIN region r
+ON r.id = s.region_id;
+
+SELECT DISTINCT r.name region, a.name account
+FROM accounts a
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+JOIN region r
+ON r.id = s.region_id;
+-- both queries return same number of results. hence no accounts are
+-- associated with more than one region
+
+-- 2. have any sales reps worked on more than one account?
+SELECT s.name sales_rep, a.name accounts
+FROM sales_reps s
+JOIN accounts a
+ON s.id = a.sales_rep_id;
+-- returns 351 rows
+
+SELECT DISTINCT s.id,  s.name
+FROM sales_reps s
+-- returns 50 rows
+
+
 
 
