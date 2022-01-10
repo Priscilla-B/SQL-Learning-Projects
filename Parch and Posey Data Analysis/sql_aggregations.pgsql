@@ -228,9 +228,98 @@ ON s.id = a.sales_rep_id;
 -- returns 351 rows
 
 SELECT DISTINCT s.id,  s.name
-FROM sales_reps s
+FROM sales_reps s;
 -- returns 50 rows
 
 
 
+-- HAVING: used to filter on agregate columns in place of the WHERE clause
+
+-- QUESTIONS
+-- 1. How many of the sales reps have more than 5 accounts that they manage?
+SELECT COUNT(*)
+FROM (
+    SELECT s.id sales_rep, COUNT(a.name) num_accounts
+    FROM sales_reps s
+    JOIN accounts a
+    ON s.id = a.sales_rep_id
+    GROUP BY s.id
+    HAVING COUNT(a.name) > 5
+) sales_rep_accounts;
+
+-- 2. How many accounts have more than 20 orders?
+
+SELECT COUNT(*)
+FROM (
+    SELECT a.id account, COUNT(o.id) num_orders
+    FROM accounts a
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY a.id
+    HAVING COUNT(o.id) > 20
+) accounts_orders;
+
+-- 3. Which account has the most orders?
+
+SELECT a.name account, COUNT(o.id) num_orders
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name
+ORDER BY 2 DESC
+LIMIT 1;
+
+-- 4. How many accounts spent more than 30,000 usd total across all orders?
+
+SELECT COUNT(*)
+FROM (
+    SELECT a.id account, SUM(total_amt_usd) sum_order_amt
+    FROM accounts a
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY a.id
+    HAVING SUM(total_amt_usd) > 30000
+) account_orders;
+
+-- 5. How many accounts spent less than 1,000 usd total across all orders?
+
+SELECT COUNT(*)
+FROM (
+    SELECT a.id account, SUM(total_amt_usd) sum_order_amt
+    FROM accounts a
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY a.id
+    HAVING SUM(total_amt_usd) < 1000
+) account_orders;
+
+-- 6. Which account has spent the most with us?
+SELECT a.id, a.name account, SUM(total_amt_usd) sum_order_amt
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id
+ORDER BY 3 DESC
+LIMIT 1;
+
+-- 7. Which account has spent the least with us?
+SELECT a.id, a.name account, SUM(total_amt_usd) sum_order_amt
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.id
+ORDER BY 3 
+LIMIT 1;
+
+-- 8. Which accounts used facebook as a channel to contact customers more than 6 times?
+SELECT COUNT(*)
+FROM(
+    SELECT a.id, a.name, COUNT(w.channel)
+    FROM accounts a
+    JOIN web_events w
+    ON a.id = w.account_id
+    WHERE w.channel = 'facebook'
+    GROUP BY a.id
+    HAVING COUNT(w.channel) > 6
+) accounts_channels
 
