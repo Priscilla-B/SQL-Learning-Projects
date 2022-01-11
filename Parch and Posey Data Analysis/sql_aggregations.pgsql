@@ -340,5 +340,103 @@ JOIN web_events w
 ON a.id = w.account_id
 GROUP BY a.id, w.channel
 ORDER BY COUNT(w.channel) DESC
-LIMIT 10 -- all top 10 are direct channels
+LIMIT 10; -- all top 10 are direct channels
+
+
+-- DATE FUNCTIONS
+-- grouping by dates in sql is not always very helpful as dates are usually
+-- stored to a very granular level(as low as miliseconds)
+-- databases usually store dates from the least granular to most granular part of the
+-- date: YYYY MM DD. It makes sure ordering is the same if their ordered as dates(in 
+-- chronological order) or as text(in alphabetical order)
+-- date functions helps to groupby dates by enabling us to truncate or select parts
+-- of a date for our analysis
+-- the DATE_TRUNC function helps us to truncate a date to a given date part
+
+SELECT DATE_TRUNC('day', occurred_at), SUM(standard_qty) AS standard_qty_sum
+FROM orders
+GROUP BY 1
+ORDER BY 1;
+
+-- this truncates dates to day by setting time to 00:00:00 for each date
+-- 1 here represents the date_trunc column since it's the first column in the select statement
+
+-- use DATE_PART to pull out a given part of a date
+SELECT DATE_PART('dow', occurred_at) AS day_of_week,
+    SUM(total) AS total_qty
+FROM orders
+GROUP BY 1
+ORDER BY 2 DESC;
+-- this show how many quantities were ordered at each day of the week
+-- dow stands for day of week
+
+
+-- QUESTIONS
+-- 1. Find the sales in terms of total dollars for all orders in each year, ordered 
+-- from greatest to least. Do you notice any trends in the yearly sales totals?
+-- Are all months evenly represented by the dataset?
+SELECT DATE_PART('year', occurred_at)  year_of_sale,
+    SUM(total_amt_usd) total_sales_amt
+FROM orders
+GROUP BY 1
+ORDER BY 2 DESC;
+-- sales generally increased as years increased
+
+-- checking how many months of sales are present in each year
+SELECT DATE_PART('year', occurred_at) sale_year, 
+    DATE_PART('month', occurred_at) sale_month
+FROM orders
+GROUP BY 1, 2
+ORDER BY 1;
+-- each year has 12 months of sales except 2013 and 2017 which have one month of sale each
+
+
+-- 2. Which month did Parch & Posey have the greatest sales in terms of 
+-- total dollars? 
+SELECT DATE_PART('month', occurred_at) month_of_sale,
+    SUM(total_amt_usd) total_sales_amount
+FROM orders
+GROUP BY 1
+ORDER BY 2 DESC;
+-- December is the month with the highest sales
+-- not all months are equally represented in dataset. December has more orders
+
+-- 3. Which year did Parch & Posey have the greatest sales in terms of total number of orders? 
+-- Are all years evenly represented by the dataset?
+SELECT DATE_PART('year', occurred_at) year_of_sale,
+    COUNT(*) num_of_orders
+FROM orders
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1;
+
+-- 4. Which month did Parch & Posey have the greatest sales in terms of total 
+-- number of orders? Are all months evenly represented by the dataset?
+SELECT DATE_PART('month', occurred_at) month_of_sale,
+    COUNT(*) num_of_orders
+FROM orders
+WHERE occurred_at BETWEEN '2014-01-01' AND '2017-01-01'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1;
+
+-- 5. In which month of which year did Walmart spend the most on 
+-- gloss paper in terms of dollars?
+SELECT DATE_PART('year', o.occurred_at) year_of_sale, 
+    DATE_PART('month', o.occurred_at) month_of_sale,
+    SUM(o.gloss_amt_usd) sum_gloss_amt
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+WHERE a.name = 'Walmart'
+GROUP BY 1, 2
+ORDER BY 3 DESC
+LIMIT 1;
+-- may 2016
+
+
+
+
+
+
 
