@@ -321,5 +321,24 @@ FROM(
     WHERE w.channel = 'facebook'
     GROUP BY a.id
     HAVING COUNT(w.channel) > 6
-) accounts_channels
+) accounts_channels;
+
+-- 9. Which account used facebook most as a channel?
+SELECT a.id, a.name, COUNT(w.channel) num_channel_usage
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+WHERE w.channel = 'facebook'
+GROUP BY a.id
+ORDER BY COUNT(w.channel) DESC
+LIMIT 1;
+
+-- 10. Which channel was most frequently used by most accounts?
+SELECT a.id, a.name, w.channel, COUNT(w.channel) num_channel_usage
+FROM accounts a
+JOIN web_events w
+ON a.id = w.account_id
+GROUP BY a.id, w.channel
+ORDER BY COUNT(w.channel) DESC
+LIMIT 10 -- all top 10 are direct channels
 
