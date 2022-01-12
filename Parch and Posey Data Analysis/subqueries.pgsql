@@ -1,0 +1,4 @@
+-- subqueries enable querying from the results of another query
+-- this allows you build more transformations into your query, organize work more easily
+-- and make your queries run faster.
+-- also known as inner queries or nested queries
