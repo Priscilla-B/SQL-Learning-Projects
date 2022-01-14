@@ -26,3 +26,26 @@ SELECT DATE_TRUNC('Day', occurred_at) day_,
     FROM web_events
 GROUP BY 1, 2
 ORDER BY 3 DESC;
+
+-- subquery formatting
+-- best practice is to indent subquery within outer query to make it easier to read
+
+-- more on subqueries
+-- subqueries can be used in several places within a query
+-- it can be used anywhere you'd use a table, a column name or even an individual value
+-- they are especially useful in conditional logic - in conjunction with the WHERE or JOIN clauses or 
+-- or in the WHEN portion of a CASE statement
+
+-- Example: selecting orders that occurred in the first month of sales
+SELECT * 
+FROM orders
+WHERE DATE_TRUNC('month', occurred_at) = 
+    (SELECT DATE_TRUNC('month', MIN(occurred_at))
+    FROM orders)
+ORDER BY occurred_at
+-- the subquery works with the WHERE logic because the inner query provides only one result
+-- this is the case for all other logic functions, except IN, which can work with inner
+-- queries that return more than one result
+-- you should not include an alias when you include a subquery in a conditional statement since the 
+-- subquery returns only one result, except subquery returns multiple result(when used with IN)
+
