@@ -42,10 +42,20 @@ FROM orders
 WHERE DATE_TRUNC('month', occurred_at) = 
     (SELECT DATE_TRUNC('month', MIN(occurred_at))
     FROM orders)
-ORDER BY occurred_at
+ORDER BY occurred_at;
 -- the subquery works with the WHERE logic because the inner query provides only one result
 -- this is the case for all other logic functions, except IN, which can work with inner
 -- queries that return more than one result
 -- you should not include an alias when you include a subquery in a conditional statement since the 
 -- subquery returns only one result, except subquery returns multiple result(when used with IN)
+
+-- QUIZ
+-- The average amount of standard paper sold on the first month that any order was placed 
+-- in the orders table (in terms of quantity).
+SELECT AVG(standard_qty) avg_std,
+    AVG(gloss_qty) avg_gloss, AVG(poster_qty) avg_poster, SUM(total_amt_usd)
+FROM orders
+WHERE DATE_TRUNC('month', occurred_at) = 
+    (SELECT DATE_TRUNC('month', MIN(occurred_at))
+    FROM orders)
 
