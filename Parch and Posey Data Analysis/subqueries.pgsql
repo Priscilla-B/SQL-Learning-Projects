@@ -57,5 +57,32 @@ SELECT AVG(standard_qty) avg_std,
 FROM orders
 WHERE DATE_TRUNC('month', occurred_at) = 
     (SELECT DATE_TRUNC('month', MIN(occurred_at))
-    FROM orders)
+    FROM orders);
+
+-- Provide the name of the sales_rep in each region with the largest amount of total_amt_usd sales.
+SELECT s.name sales_rep, r.name region, SUM(total_amt_usd) sales
+    FROM sales_reps s
+    JOIN region r
+    ON r.id = s.region_id
+    JOIN accounts a
+    ON s.id = a.sales_rep_id
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY 1, 2
+    ORDER BY 3 DESC;
+
+
+SELECT region, MAX(sales)
+FROM (
+    SELECT s.name sales_rep, r.name region, SUM(total_amt_usd) sales
+    FROM sales_reps s
+    JOIN region r
+    ON r.id = s.region_id
+    JOIN accounts a
+    ON s.id = a.sales_rep_id
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY 1, 2
+    ) sub
+GROUP BY 1
 
