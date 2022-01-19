@@ -116,3 +116,18 @@ JOIN (
     GROUP BY 1) q2
 ON q1.sales = q2.sales
 ORDER BY sales DESC;
+
+-- For the region with the largest (sum) of sales total_amt_usd, how many total (count) 
+-- orders were placed?
+
+SELECT r.name region, COUNT(*) order_count, sum(total_amt_usd) total_sales
+FROM region r
+JOIN sales_reps s
+ON r.id = s.region_id
+JOIN accounts a
+ON s.id = a.sales_rep_id
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY 1
+ORDER BY 3 DESC
+LIMIT 1;
