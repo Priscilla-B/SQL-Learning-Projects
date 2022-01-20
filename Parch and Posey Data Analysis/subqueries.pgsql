@@ -131,3 +131,94 @@ ON a.id = o.account_id
 GROUP BY 1
 ORDER BY 3 DESC
 LIMIT 1;
+
+-- using a subquery
+SELECT t1.region, t1.order_count, t1.total_sales
+FROM (
+    SELECT r.name region, COUNT(*) order_count, sum(total_amt_usd) total_sales
+    FROM region r
+    JOIN sales_reps s
+    ON r.id = s.region_id
+    JOIN accounts a
+    ON s.id = a.sales_rep_id
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY 1
+    ) t1
+JOIN(
+    SELECT MAX(total_sales) max_sales
+    FROM (
+        SELECT r.name region, COUNT(*) order_count, sum(total_amt_usd) total_sales
+        FROM region r
+        JOIN sales_reps s
+        ON r.id = s.region_id
+        JOIN accounts a
+        ON s.id = a.sales_rep_id
+        JOIN orders o
+        ON a.id = o.account_id
+        GROUP BY 1
+        )sub
+    )t2
+ON t1.total_sales = t2.max_sales;
+
+-- alternatively
+SELECT r.name, COUNT(o.total) total_orders
+FROM sales_reps s
+JOIN accounts a
+ON a.sales_rep_id = s.id
+JOIN orders o
+ON o.account_id = a.id
+JOIN region r
+ON r.id = s.region_id
+GROUP BY r.name
+HAVING SUM(o.total_amt_usd) = (
+      SELECT MAX(total_amt)
+      FROM (SELECT r.name region_name, SUM(o.total_amt_usd) total_amt
+              FROM sales_reps s
+              JOIN accounts a
+              ON a.sales_rep_id = s.id
+              JOIN orders o
+              ON o.account_id = a.id
+              JOIN region r
+              ON r.id = s.region_id
+              GROUP BY r.name) sub);
+
+
+-- How many accounts had more total purchases than the account name which has 
+-- bought the most standard_qty paper throughout their lifetime as a customer?
+
+-- first find account names and the amount of standard paper bought
+SELECT a.name account_name, SUM(o.standard_qty) total_std_qty
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY 1;
+
+-- then find max qty bought
+SELECT MAX(total_std_qty) max_std_qty
+FROM (
+    SELECT a.name account_name, SUM(o.standard_qty) total_std_qty
+    FROM accounts a
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY 1
+    )sub;
+
+-- then count num of accounts from first query with total_std_qty > max
+SELECT COUNT(*)
+FROM (
+    SELECT a.name account_name, SUM(o.standard_qty) total_std_qty
+    FROM accounts a
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY 1
+    HAVING SUM(o.standard_qty) >( SELECT MAX(total_std_qty) max_std_qty
+                    FROM (
+                        SELECT a.name account_name, SUM(o.standard_qty) total_std_qty
+                        FROM accounts a
+                        JOIN orders o
+                        ON a.id = o.account_id
+                        GROUP BY 1
+                        )sub ) 
+    ) t1
+
