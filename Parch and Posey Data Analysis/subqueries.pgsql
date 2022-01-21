@@ -212,9 +212,9 @@ FROM (
     JOIN orders o
     ON a.id = o.account_id
     GROUP BY 1
-    HAVING SUM(o.standard_qty) >( SELECT MAX(total_std_qty) max_std_qty
+    HAVING SUM(o.total) >( SELECT MAX(total_std_qty) max_std_qty
                     FROM (
-                        SELECT a.name account_name, SUM(o.standard_qty) total_std_qty
+                        SELECT a.name account_name, SUM(o.total) total_std_qty
                         FROM accounts a
                         JOIN orders o
                         ON a.id = o.account_id
