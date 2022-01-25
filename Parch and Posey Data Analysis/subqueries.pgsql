@@ -188,37 +188,36 @@ HAVING SUM(o.total_amt_usd) = (
 -- bought the most standard_qty paper throughout their lifetime as a customer?
 
 -- first find account names and the amount of standard paper bought
-SELECT a.name account_name, SUM(o.standard_qty) total_std_qty
+SELECT a.name account_name, SUM(o.standard_qty) total_std_qty, SUM(total) total_qty
 FROM accounts a
 JOIN orders o
 ON a.id = o.account_id
 GROUP BY 1;
 
 -- then find max qty bought
-SELECT MAX(total_std_qty) max_std_qty
-FROM (
-    SELECT a.name account_name, SUM(o.standard_qty) total_std_qty
-    FROM accounts a
-    JOIN orders o
-    ON a.id = o.account_id
-    GROUP BY 1
-    )sub;
+SELECT SUM(o.standard_qty) total_std_qty
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name
+ORDER BY 1 DESC
+LIMIT 1;
 
 -- then count num of accounts from first query with total_std_qty > max
 SELECT COUNT(*)
 FROM (
-    SELECT a.name account_name, SUM(o.standard_qty) total_std_qty
+    SELECT a.name account_name, SUM(o.standard_qty) total_std_qty, SUM(total) total_qty
     FROM accounts a
     JOIN orders o
     ON a.id = o.account_id
     GROUP BY 1
-    HAVING SUM(o.total) >( SELECT MAX(total_std_qty) max_std_qty
-                    FROM (
-                        SELECT a.name account_name, SUM(o.total) total_std_qty
-                        FROM accounts a
-                        JOIN orders o
-                        ON a.id = o.account_id
-                        GROUP BY 1
-                        )sub ) 
-    ) t1
-
+) t1
+WHERE t1.total_qty > (
+    SELECT SUM(o.standard_qty) total_std_qty
+    FROM accounts a
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY a.name
+    ORDER BY 1 DESC
+    LIMIT 1
+    );
