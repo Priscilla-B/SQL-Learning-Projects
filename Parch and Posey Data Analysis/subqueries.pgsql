@@ -117,7 +117,7 @@ JOIN (
 ON q1.sales = q2.sales
 ORDER BY sales DESC;
 
--- For the region with the largest (sum) of sales total_amt_usd, how many total (count) 
+-- 2. For the region with the largest (sum) of sales total_amt_usd, how many total (count) 
 -- orders were placed?
 
 SELECT r.name region, COUNT(*) order_count, sum(total_amt_usd) total_sales
@@ -184,7 +184,7 @@ HAVING SUM(o.total_amt_usd) = (
               GROUP BY r.name) sub);
 
 
--- How many accounts had more total purchases than the account name which has 
+-- 3. How many accounts had more total purchases than the account name which has 
 -- bought the most standard_qty paper throughout their lifetime as a customer?
 
 -- first find account names and the amount of standard paper bought
@@ -221,3 +221,93 @@ WHERE t1.total_qty > (
     ORDER BY 1 DESC
     LIMIT 1
     );
+
+-- 4. For the customer that spent the most (in total over their lifetime as a customer) 
+-- total_amt_usd, how many web_events did they have for each channel?
+
+-- first find customer with highest total amount spent
+SELECT a.name customer
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+GROUP BY a.name
+ORDER BY SUM(o.total_amt_usd) DESC
+LIMIT 1;
+
+-- then select the requires columns on the condition that the customer name 
+-- meets the criteria in the above query
+SELECT w.channel, COUNT(w.channel) num_events
+FROM web_events w
+JOIN accounts a
+ON a.id = w.account_id
+GROUP BY a.name, w.channel
+HAVING a.name = (
+    SELECT a.name customer
+    FROM orders o
+    JOIN accounts a
+    ON a.id = o.account_id
+    GROUP BY a.name
+    ORDER BY SUM(o.total_amt_usd) DESC
+    LIMIT 1
+);
+-- note: you can use a column name in a groupby or order by without having to select it
+
+
+-- 5. What is the lifetime average amount spent in terms of total_amt_usd 
+-- for the top 10 total spending accounts?
+
+-- first find top 10 spending accounts
+SELECT a.name customer, SUM(o.total_amt_usd) total_spent
+FROM orders o
+JOIN accounts a
+ON a.id = o.account_id
+GROUP BY a.name
+ORDER BY SUM(o.total_amt_usd) DESC
+LIMIT 10;
+
+-- then find the average of the amounts they've spent
+SELECT AVG(sub.total_spent) avg_lifetime_spend
+FROM (
+    SELECT a.name customer, SUM(o.total_amt_usd) total_spent
+    FROM orders o
+    JOIN accounts a
+    ON a.id = o.account_id
+    GROUP BY a.name
+    ORDER BY SUM(o.total_amt_usd) DESC
+    LIMIT 10
+)sub;
+
+
+-- 6. What is the lifetime average amount spent in terms of total_amt_usd, 
+-- including only the companies that spent more per order, on average, than the average of all orders.
+
+-- first find avg amt spent on all orders
+SELECT AVG(total_amt_usd) avg_spent_all
+FROM orders;
+
+-- then find companies that spent more than avg amount
+SELECT a.name, AVG(o.total_amt_usd) total_spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name
+HAVING AVG(o.total_amt_usd) > (
+    SELECT AVG(total_amt_usd) avg_spent_all
+    FROM orders
+);
+    
+
+-- then find the average of what they spent
+
+SELECT AVG(total_spent)
+FROM (
+    SELECT a.name, AVG(o.total_amt_usd) total_spent
+    FROM accounts a
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY a.name
+    HAVING AVG(o.total_amt_usd) > (
+        SELECT AVG(total_amt_usd) avg_spent_all
+        FROM orders
+        )
+)sub;
