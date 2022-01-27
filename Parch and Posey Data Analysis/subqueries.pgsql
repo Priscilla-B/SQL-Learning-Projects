@@ -311,3 +311,15 @@ FROM (
         FROM orders
         )
 )sub;
+
+-- WITH: COMMON TABLE EXPRESSIONS(CTE)
+-- The WITH statement is often called a CTE
+-- It serves the exact purpose as subqueries, but are more common in practice
+-- as they are cleaner and easier for a future reader to follow
+-- CTEs work like functions in programming. At the top of your file, before you start
+-- writing any queries, you can write all the inner queries you'll be using and name them 
+-- with the WITH statement.
+-- From there, if you need to use any of the inner queries in another query, you reference
+-- them by the defined name
+-- this makes it easier to read and follow through subqueries.
+
