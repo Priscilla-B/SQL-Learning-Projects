@@ -323,3 +323,19 @@ FROM (
 -- them by the defined name
 -- this makes it easier to read and follow through subqueries.
 
+-- Example: You need to find the average number of events for each channel per day.
+WITH events AS (
+          SELECT DATE_TRUNC('day',occurred_at) AS day, 
+                        channel, COUNT(*) as events
+          FROM web_events 
+          GROUP BY 1,2)
+
+SELECT channel, AVG(events) AS average_events
+FROM events
+GROUP BY channel
+ORDER BY 2 DESC;
+
+
+-- QUIZZES
+-- 1. Provide the name of the sales_rep in each region with the largest amount of total_amt_usd sales.
+
