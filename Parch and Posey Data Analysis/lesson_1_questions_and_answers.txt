@@ -77,9 +77,6 @@ LIMIT 10;
 -- 12. Write a query that finds the percentage of revenue that comes from poster paper for
 --  each order. You will need to use only the columns that end with _usd. 
 -- (Try to do this without using the total column.) Display the id and account_id fields also
-SELECT id, account_id, 
-    poster_amt_usd/(poster_amt_usd + standard_amt_usd + gloss_amt_usd + 0.00001) poster_per
-FROM orders;
 
 
 -- 13. Use the accounts table to find
@@ -87,25 +84,8 @@ FROM orders;
 -- All companies whose names contain the string 'one' somewhere in the name.
 -- All companies whose names end with 's'.
 
-SELECT name
-FROM accounts
-WHERE name LIKE 'C%';
-
-SELECT name
-FROM accounts
-WHERE name LIKE '%one%';
-
-SELECT name
-FROM accounts
-WHERE name LIKE '%s';
-
-
 -- 14. Use the accounts table to find the account name, primary_poc, 
 -- and sales_rep_id for Walmart, Target, and Nordstrom.
-SELECT name, primary_poc, sales_rep_id
-FROM accounts
-WHERE name IN ('Walmart', 'Target', 'Nordstrom');
-
 
 -- 15. Use the web_events table to find all information regarding individuals who
 --  were contacted via the channel of organic or adwords.
@@ -141,19 +121,9 @@ WHERE name IN ('Walmart', 'Target', 'Nordstrom');
 
 -- 24. Write a query that returns a list of orders where the standard_qty is zero and either 
 -- the gloss_qty or poster_qty is over 1000.
-SELECT *
-FROM orders
-WHERE standard_qty = 0 AND (gloss_qty > 1000 or poster_qty > 1000);
-
 
 -- 25. Find all the company names that start with a 'C' or 'W', and the primary contact 
 -- contains 'ana' or 'Ana', but it doesn't contain 'eana'.
-
-SELECT name, primary_poc
-FROM accounts
-WHERE (name LIKE 'C%' OR name LIKE 'W%')
-    AND ((primary_poc LIKE '%ana%' OR primary_poc LIKE '%Ana%')
-        AND primary_poc NOT LIKE '%eana%');
 
 
 

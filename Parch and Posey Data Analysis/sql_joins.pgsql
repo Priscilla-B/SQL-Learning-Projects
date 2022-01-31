@@ -99,7 +99,7 @@ JOIN sales_reps s
 ON s.region_id = r.id
 JOIN accounts a
 ON a.sales_rep_id = s.id
-WHERE r.name = 'Midwest'
+-- WHERE r.name = 'Midwest'
 ORDER BY a.name;
 
 
