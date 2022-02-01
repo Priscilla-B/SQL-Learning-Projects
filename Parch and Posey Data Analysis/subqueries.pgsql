@@ -339,3 +339,51 @@ ORDER BY 2 DESC;
 -- QUIZZES
 -- 1. Provide the name of the sales_rep in each region with the largest amount of total_amt_usd sales.
 
+WITH region_max_amt AS(
+    SELECT r.name region, MAX(o.total_amt_usd) max_amt
+    FROM sales_reps s
+    JOIN region r
+    ON r.id = s.region_id
+    JOIN accounts a
+    ON s.id = a.sales_rep_id
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY r.name)
+
+SELECT s.name sales_rep, r_.region, r_.max_amt
+FROM sales_reps s
+JOIN accounts a
+ON s.id = a.sales_rep_id
+JOIN orders o
+ON a.id = o.account_id
+JOIN region_max_amt r_
+ON o.total_amt_usd = r_.max_amt;
+
+
+-- For the region with the largest sales total_amt_usd, how many total orders were placed?
+WITH region_sales AS(
+    SELECT r.name region, SUM(o.total_amt_usd) total_sales
+    FROM region r
+    JOIN sales_reps s
+    ON r.id = s.region_id
+    JOIN accounts a
+    ON s.id = a.sales_rep_id
+    JOIN orders o
+    ON a.id = o.account_id
+    GROUP BY r.name
+)
+
+SELECT rs.region, COUNT(*)
+FROM region_sales rs
+JOIN region r
+ON r.name = rs.region
+JOIN sales_reps s
+ON r.id = s.region_id
+JOIN accounts a
+ON s.id = a.sales_rep_id
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY rs.region
+ORDER BY SUM(o.total_amt_usd) DESC
+LIMIT 1
+
